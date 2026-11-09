@@ -15,8 +15,8 @@ PRACTICE = DOCS / "practice"
 SITE_URL = "https://skill-guide.edunfuture.workers.dev/"
 
 # ── 유튜브 영상: 주소를 받으면 여기에 넣고 다시 빌드 ──
-VIDEO_URL = ""          # 예) "https://youtu.be/XXXXXXXXXXX"
-VIDEO_TITLE = "스킬 제작 따라 하기 영상"
+VIDEO_URL = "https://youtu.be/ChMliaRgQek"   # 스마트워크톤 홍보영상(확장판)
+VIDEO_TITLE = "AI가 처음이어도 괜찮습니다 — 스마트워크톤 이야기"
 
 PC = "프롬프트 붙여넣기·메모장 저장은 PC에서 하세요. 휴대폰에서는 화면 확인·복습용으로 보세요. 그림은 탭하면 크게 볼 수 있습니다."
 AI_TITLE = "AI 채팅 (ChatGPT · Claude · Gemini 공통)"
@@ -216,7 +216,7 @@ def video_block():
 home = clay_hero("제5회 2026 스마트워크톤 · 트랙B", "스킬 제작 가이드<br><em>복사·붙여넣기로<br>완성하는 AI 스킬</em>",
             "AI를 잘 몰라도 괜찮습니다. 화면 순서대로 복사하고 붙여넣기만 하면, 상품 정보 하나로 마케팅 콘텐츠를 한 번에 만드는 나만의 AI 스킬이 완성됩니다.",
             ["📋 복사·붙여넣기", "🤖 ChatGPT·Claude·Gemini", "📄 txt 제출", "⏱ 약 90분"]) + wrap(
-    section("먼저 영상으로 한 번 보기", "전체 흐름을 보고 시작하면 훨씬 쉽습니다")
+    section("시작하기 전에, 이 영상 먼저", "AI가 낯설어도, 대회가 처음이어도 괜찮습니다 — 2분이면 마음이 한결 가벼워집니다")
     + video_block()
     + section("오늘의 과제", "개인전 과제를 그대로 따라갑니다")
     + table(["항목", "내용"], [
