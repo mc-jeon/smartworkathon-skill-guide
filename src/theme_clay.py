@@ -104,6 +104,17 @@ figure.shot{border:1px solid #e6e3f2;border-radius:18px;box-shadow:0 22px 40px -
 .video{border-radius:26px;background:linear-gradient(135deg,#efeaff,#fde9f2 55%,#fff1e6);box-shadow:0 26px 50px -28px rgba(105,85,175,.6),inset 0 1px 0 #fff}
 .video .ph{color:var(--ink)}
 .video .ph b{color:var(--pu2)}
+/* ── 하단 이전/다음 ── */
+.pager{max-width:1120px;margin:0 auto;padding:0 18px 56px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pager a{display:flex;flex-direction:column;gap:2px;text-decoration:none;padding:16px 20px;border-radius:22px;border:1px solid #fff;color:var(--ink);
+  background:linear-gradient(160deg,#fff,#f4f1ff);box-shadow:0 14px 28px -18px rgba(90,80,160,.5),inset 0 1px 0 #fff;transition:transform .2s,box-shadow .2s}
+.pager a:hover{transform:translateY(-4px);box-shadow:0 20px 34px -18px rgba(90,80,160,.6)}
+.pager a small{font-size:12.5px;font-weight:800;color:#7a73a8}
+.pager a b{font-size:17px;font-weight:900}
+.pager a.next{grid-column:2;text-align:right;color:#fff;background:linear-gradient(135deg,var(--acc1),var(--acc2));box-shadow:0 14px 26px -14px var(--acc2),inset 0 2px 0 rgba(255,255,255,.35)}
+.pager a.next small{color:rgba(255,255,255,.88)}
+@media(max-width:520px){.pager{gap:10px;padding:0 12px 44px}.pager a{padding:13px 14px;border-radius:18px}.pager a b{font-size:15px}}
+@media print{.pager{display:none}}
 @media(max-width:860px){.hero-in{grid-template-columns:1fr}.scene{height:300px;max-width:520px;width:100%}.c-doc{left:4%;width:58%;height:240px}}
 @media(max-width:520px){.thero{padding:16px;gap:12px;border-radius:22px}.thero .big{width:52px;height:52px;font-size:26px;border-radius:18px}.scene{height:270px}.o2{right:auto;left:38%;top:-14px;width:40px;height:40px;border-width:9px}.c-out{font-size:12.5px;padding:9px 10px}.c-doc .h{font-size:15px}}
 @media(prefers-reduced-motion:reduce){.stage,.c-doc,.c-out,.orb,.o4,.thero .big{animation:none!important}.page.show .step,.page.show .thero{animation:none}.card:hover,.flow .fs:hover{transform:none}}
@@ -125,3 +136,19 @@ def clay_hero(eyebrow, title_html, desc, pills):
 def tab_hero(icon, num, title, sub):
     return (f'<div class="thero"><div class="big">{icon}</div><div><div class="num">{E(num)}</div>'
             f'<h2>{E(title)}</h2><p>{E(sub)}</p></div></div>')
+
+
+def add_pager(pages):
+    """각 페이지 맨 아래에 '이전 단계 / 다음 단계' 버튼을 붙인다(탭 전환은 런타임의 data-go 사용)."""
+    def label(pg):
+        return f"{pg.num} {pg.label}" if pg.num and pg.num != "+" else pg.label
+    for i, pg in enumerate(pages):
+        prev_html = next_html = ""
+        if i > 0:
+            pv = pages[i - 1]
+            prev_html = f'<a class="prev" href="#{pv.pid}" data-go="{pv.pid}"><small>← 이전 단계</small><b>{E(label(pv))}</b></a>'
+        if i < len(pages) - 1:
+            nx = pages[i + 1]
+            cap = "시작하기" if i == 0 else "다음 단계"
+            next_html = f'<a class="next" href="#{nx.pid}" data-go="{nx.pid}"><small>{cap} →</small><b>{E(label(nx))}</b></a>'
+        pg.html += f'<nav class="pager" aria-label="단계 이동">{prev_html}{next_html}</nav>'

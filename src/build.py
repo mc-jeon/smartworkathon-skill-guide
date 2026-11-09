@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lessonkit import (E, Page, app_window, box, build, cards, dialog, downloads, dropdown, fig, figs, flow, gbtn, hero,
                        kbd, menubar, mk, prompt, section, shot_list_section, step, table, ui, wrap)
-from theme_clay import THEME_CSS, clay_hero, tab_hero
+from theme_clay import THEME_CSS, add_pager, clay_hero, tab_hero
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
@@ -487,9 +487,12 @@ blocks = [("1-1 한 줄 부탁(맛보기)", P_TASTE_1), ("1-2 정보와 형식�
     "스마트워크톤 트랙B · 제출 전 점검표\n\n" + "\n".join(f"[ ] {a} — {b}" for a, b in CHECKLIST)
     + "\n\n제출 파일\n[ ] ① 트랙B_스킬_내이름.txt\n[ ] ② 트랙B_출력물_감귤잼_내이름.txt\n", encoding="utf-8")
 
-build(DOCS / "index.html", [
+PAGES = [
     Page("home", "", "홈", home), Page("p0", "0", "준비", p0), Page("p1", "1", "맛보기", p1), Page("p2", "2", "스킬 만들기", p2),
-    Page("p3", "3", "실행", p3), Page("p4", "4", "점검·고치기", p4), Page("p5", "5", "제출", p5), Page("ap", "+", "부록", ap)],
+    Page("p3", "3", "실행", p3), Page("p4", "4", "점검·고치기", p4), Page("p5", "5", "제출", p5), Page("ap", "+", "부록", ap)]
+add_pager(PAGES)
+
+build(DOCS / "index.html", PAGES,
     title="스킬 제작 가이드 | 스마트워크톤 트랙B",
     description="복사·붙여넣기만으로 상품 정보 하나로 마케팅 콘텐츠를 한 번에 만드는 AI 스킬(txt)을 완성하는 단계별 가이드",
     brand=("B", "스킬 제작 가이드", "제5회 스마트워크톤 · 트랙B"),
