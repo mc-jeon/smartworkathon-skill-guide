@@ -17,6 +17,8 @@ SITE_URL = "https://skill-guide.edunfuture.workers.dev/"
 # ── 유튜브 영상: 주소를 받으면 여기에 넣고 다시 빌드 ──
 VIDEO_URL = "https://youtu.be/ChMliaRgQek"   # 스마트워크톤 홍보영상(확장판)
 VIDEO_TITLE = "AI가 처음이어도 괜찮습니다 — 스마트워크톤 이야기"
+GUIDE_VIDEO_URL = "https://www.youtube.com/watch?v=nq9JhgFXajE"   # 스킬 제작 가이드 소개영상
+GUIDE_TITLE = "스킬 제작 가이드 소개 (54초)"
 
 PC = "프롬프트 붙여넣기·메모장 저장은 PC에서 하세요. 휴대폰에서는 화면 확인·복습용으로 보세요. 그림은 탭하면 크게 볼 수 있습니다."
 AI_TITLE = "AI 채팅 (ChatGPT · Claude · Gemini 공통)"
@@ -141,6 +143,10 @@ EXTRA_CSS = """
 .ws .res{display:flex;gap:10px;align-items:center;background:#3a3a3a;border-radius:8px;padding:10px}
 .ws .ico{width:26px;height:26px;border-radius:6px;background:#3d8be6}
 .vwrap{max-width:820px;margin:0 auto}
+.vpair{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:820px;margin:0 auto}
+.vpair .vwrap{max-width:none;margin:0}
+.vcap{font-size:14px;font-weight:700;margin:6px 0 0}
+@media (max-width:640px){.vpair{grid-template-columns:1fr}}
 .video{position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;background:#0b1f4b;margin:10px 0}
 .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .video .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px}
@@ -203,20 +209,26 @@ def skill_preview():
             "1. 입력받을 정보\n- 상품명:\n- 상품 특징(3~5개):\n- 홍보 대상:\n…\n\n2. 꼭 지킬 규칙\n- 입력에 없는 성능·가격은 지어내지 않는다 …")
 
 
-def video_block():
-    if VIDEO_URL:
-        vid = VIDEO_URL.rstrip("/").split("/")[-1].split("v=")[-1].split("?")[0].split("&")[0]
-        frame = (f'<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/{E(vid)}" title="{E(VIDEO_TITLE)}" '
+def yt_block(url, title, icon):
+    if url:
+        vid = url.rstrip("/").split("/")[-1].split("v=")[-1].split("?")[0].split("&")[0]
+        frame = (f'<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/{E(vid)}" title="{E(title)}" '
                  'loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>')
-        return '<div class="vwrap">' + frame + f'<p class="vlink">영상이 안 보이면 👉 <a href="{E(VIDEO_URL)}" target="_blank" rel="noopener">유튜브에서 바로 보기</a></p></div>'
+        return ('<div class="vwrap">' + f'<p class="vcap">{icon} {E(title)}</p>' + frame
+                + f'<p class="vlink">영상이 안 보이면 👉 <a href="{E(url)}" target="_blank" rel="noopener">유튜브에서 바로 보기</a></p></div>')
     return '<div class="vwrap"><div class="video"><div class="ph"><b>🎬 따라 하기 영상 준비 중</b>영상이 올라오면 이 자리에서 바로 볼 수 있습니다.</div></div></div>'
+
+
+def video_block():
+    """기존 홍보영상(유튜브)과 가이드 소개영상을 좌우로 나란히. 휴대폰에서는 위아래로."""
+    return '<div class="vpair">' + yt_block(VIDEO_URL, VIDEO_TITLE, "🎬") + yt_block(GUIDE_VIDEO_URL, GUIDE_TITLE, "🧭") + '</div>'
 
 
 # ───────────────────────── 홈 ─────────────────────────
 home = clay_hero("제5회 2026 스마트워크톤 · 트랙B", "스킬 제작 가이드<br><em>복사·붙여넣기로<br>완성하는 AI 스킬</em>",
             "AI를 잘 몰라도 괜찮습니다. 화면 순서대로 복사하고 붙여넣기만 하면, 상품 정보 하나로 마케팅 콘텐츠를 한 번에 만드는 나만의 AI 스킬이 완성됩니다.",
             ["📋 복사·붙여넣기", "🤖 ChatGPT·Claude·Gemini", "📄 txt 제출", "⏱ 약 90분"]) + wrap(
-    section("시작하기 전에, 이 영상 먼저", "AI가 낯설어도, 대회가 처음이어도 괜찮습니다 — 2분이면 마음이 한결 가벼워집니다")
+    section("시작하기 전에, 이 영상 먼저", "AI가 낯설어도, 대회가 처음이어도 괜찮습니다 — 두 영상이면 마음이 한결 가벼워집니다")
     + video_block()
     + section("오늘의 과제", "개인전 과제를 그대로 따라갑니다")
     + table(["항목", "내용"], [

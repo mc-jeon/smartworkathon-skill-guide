@@ -5,5 +5,5 @@
 - 배포: Cloudflare Workers(정적 자산) — https://skill-guide.edunfuture.workers.dev/
 - 재배포: `npx wrangler deploy` (저장소 자동 배포는 아직 미연결)
 - 수정: `src/build.py` 고친 뒤 `python src/build.py` → `docs/index.html` 갱신 → 푸시하면 자동 배포
-- 유튜브 영상: `src/build.py`의 `VIDEO_URL`에 주소 입력 후 다시 빌드
+- 유튜브 영상(홈 좌우 2개): `src/build.py`의 `VIDEO_URL`(홍보영상)·`GUIDE_VIDEO_URL`(가이드 소개) 수정 후 다시 빌드
 - 실제 화면 캡처: `docs/shots/<그림ID>.png` (부록 캡처 목록 참고)
