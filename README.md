@@ -6,4 +6,5 @@
 - 재배포: `npx wrangler deploy` (저장소 자동 배포는 아직 미연결)
 - 수정: `src/build.py` 고친 뒤 `python src/build.py` → `docs/index.html` 갱신 → 푸시하면 자동 배포
 - 유튜브 영상(홈 좌우 2개): `src/build.py`의 `VIDEO_URL`(홍보영상)·`GUIDE_VIDEO_URL`(가이드 소개) 수정 후 다시 빌드
+- 모델별 페이지(ChatGPT·Claude·Gemini 탭): `src/build.py`의 `MODELS`(메뉴 이름·순서, 2026-11-10 실제 화면 기준)·`MODEL_TIPS` 수정. 서비스 화면이 바뀌면 여기만 고치고 다시 빌드
 - 실제 화면 캡처: `docs/shots/<그림ID>.png` (부록 캡처 목록 참고)

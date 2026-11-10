@@ -209,6 +209,175 @@ def skill_preview():
             "1. 입력받을 정보\n- 상품명:\n- 상품 특징(3~5개):\n- 홍보 대상:\n…\n\n2. 꼭 지킬 규칙\n- 입력에 없는 성능·가격은 지어내지 않는다 …")
 
 
+# ───────────────────────── 모델별 모형 화면(2026-11-10 실제 화면 기준) ─────────────────────────
+MODELS = {
+    "gpt": dict(
+        name="ChatGPT", url="chatgpt.com", icon="🟢", accent="#10a37f",
+        logo="ChatGPT", logo_tools="🔍 ◫", new="새 채팅", new_icon="✎",
+        items=[("🖼", "이미지"), ("🕘", "예약"), ("▥", "라이브러리"), ("@", "플러그인"), ("···", "탐색")],
+        sections=[("프로젝트", ["📁 새 프로젝트"])], hist_title="최근",
+        topright="◌ 임시 채팅", hello="오늘은 무엇을 해볼까요?", placeholder="ChatGPT에게 물어보세요",
+        right_icons="🎙", modes=None, profile="● 내 이름",
+        tools=["⧉ 복사", "👍", "👎", "🔊", "⤴", "↻"], copy_label="⧉ 복사",
+        item_desc={"새 채팅": "새 대화 시작 — 오늘 가장 많이 누르는 버튼", "이미지": "그림 만들기(오늘은 안 씀)",
+                   "예약": "정해진 시간에 자동 실행(오늘은 안 씀)", "라이브러리": "만든 이미지·파일 모음(오늘은 안 씀)",
+                   "플러그인": "외부 앱 연결(오늘은 안 씀)", "탐색": "GPT 등 추가 기능 둘러보기(오늘은 안 씀)",
+                   "프로젝트": "대화를 폴더처럼 묶기(선택 — '트랙B' 프로젝트를 만들어 모아 두면 편함)",
+                   "최근": "지난 대화 목록 — 4-3에서 스킬 만든 대화로 돌아갈 때 사용"},
+        today={"새 채팅", "최근"},
+    ),
+    "claude": dict(
+        name="Claude", url="claude.ai", icon="🟠", accent="#c96442",
+        logo="Claude", logo_tools="💬 ‹/›", new="새로 만들기", new_icon="＋",
+        items=[("🔍", "검색"), ("🗂", "프로젝트"), ("⧉", "아티팩트"), ("🧰", "사용자 지정")],
+        sections=[("고정됨 ⌄", [])], hist_title="최근 항목 ⌄",
+        topright="", hello="✳ 안녕하세요!", placeholder="오늘 어떤 도움을 드릴까요?",
+        right_icons="", modes=None, profile="● 내 이름",
+        tools=["⧉ 복사", "👍", "👎", "↻ 다시 시도"], copy_label="⧉ 복사",
+        item_desc={"새로 만들기": "새 대화 시작 — 다른 AI의 '새 채팅'과 같은 버튼", "검색": "지난 대화 찾기",
+                   "프로젝트": "대화와 자료를 묶어 두기(선택)", "아티팩트": "Claude가 만든 문서·화면 모음(오늘은 안 씀)",
+                   "사용자 지정": "스타일·연결 설정(오늘은 안 씀)", "고정됨": "자주 쓰는 대화를 위에 고정",
+                   "최근 항목": "지난 대화 목록 — 4-3에서 스킬 만든 대화로 돌아갈 때 사용"},
+        today={"새로 만들기", "최근 항목"},
+    ),
+    "gemini": dict(
+        name="Gemini", url="gemini.google.com", icon="🔵", accent="#4285f4",
+        logo="", logo_tools="🔍 ◫", new="새 채팅", new_icon="✎",
+        items=[("⊞", "라이브러리"), ("🖼", "이미지"), ("🕘", "예약"), ("◎", "맞춤설정"), ("···", "더보기")],
+        sections=[], hist_title="최근",
+        topright="⤓ 앱 설치  ✎", hello="무엇을 도와드릴까요?", placeholder="Gemini에게 물어보기",
+        right_icons="🎙", modes=("채팅", "작업"), profile="● 내 이름 · ⚙",
+        tools=["👍", "👎", "↻", "⤴", "⧉ 복사", "⋮"], copy_label="⧉ 복사",
+        item_desc={"새 채팅": "새 대화 시작 — 오늘 가장 많이 누르는 버튼", "라이브러리": "만든 결과물 모음(오늘은 안 씀)",
+                   "이미지": "그림 만들기(오늘은 안 씀)", "예약": "정해진 시간에 자동 실행(오늘은 안 씀)",
+                   "맞춤설정": "Gemini에게 알려 둘 내 정보(오늘은 안 씀)", "더보기": "Gem 등 추가 기능",
+                   "채팅 / 작업": "입력창 아래 선택 — 오늘은 반드시 '채팅'",
+                   "최근": "지난 대화 목록 — 4-3에서 스킬 만든 대화로 돌아갈 때 사용(안 보이면 🔍 검색)"},
+        today={"새 채팅", "채팅 / 작업", "최근"},
+    ),
+}
+
+MODEL_CSS = """
+.mw{display:flex;min-height:300px;font-size:12px;color:#1f1f1f;background:#fff}
+.mw-side{width:150px;flex-shrink:0;padding:10px 8px;display:flex;flex-direction:column;gap:1px}
+.mw-logo{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;padding:2px 6px 8px}
+.mw-logo small{font-weight:400;font-size:11px;color:#777;letter-spacing:2px}
+.mw-it{display:block;padding:4px 6px;border-radius:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mw-it.on{background:rgba(0,0,0,.07)}
+.mw-sec{color:#888;font-size:10.5px;margin:10px 6px 2px}
+.mw-prof{margin-top:auto;padding:8px 6px 0;font-size:11px;color:#555}
+.mw-main{flex:1;min-width:0;display:flex;flex-direction:column;padding:8px 12px 12px;position:relative}
+.mw-top{text-align:right;font-size:11px;color:#666;min-height:16px}
+.mw-hello{text-align:center;font-size:17px;margin:auto 0 12px;padding-top:40px}
+.mw-msgs{display:flex;flex-direction:column;gap:8px;flex:1;padding-top:4px}
+.mw-msg{white-space:pre-wrap;line-height:1.5;font-size:11.5px}
+.mw-msg.user{align-self:flex-end;max-width:82%;padding:7px 11px;border-radius:16px}
+.mw-msg.ai{align-self:flex-start;max-width:96%}
+.mw-tools{display:flex;gap:10px;font-size:11px;color:#666;margin-top:-2px}
+.mw-in{border:1px solid #dcdcdc;border-radius:22px;padding:9px 12px;display:flex;align-items:center;gap:8px;color:#888;background:#fff;
+  box-shadow:0 2px 6px rgba(0,0,0,.05);margin-top:8px}
+.mw-in .ph{flex:1;white-space:pre-wrap;overflow:hidden;max-height:58px}
+.mw-in .plus{font-size:15px;color:#555}
+.mw-in .snd{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+.mw-modes{display:flex;justify-content:center;gap:6px;margin-top:8px;font-size:11px}
+.mw-modes span{padding:3px 10px;border-radius:999px}
+.mw-modes span.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.mw-paste{display:inline-block;border:1px solid #d9d4c7;border-radius:8px;padding:5px 8px;background:#fff;font-size:10.5px;color:#555;margin-bottom:4px}
+.mw-panel{position:absolute;right:8px;top:30px;bottom:56px;width:44%;background:#fff;border:1px solid #e3ded2;border-radius:10px;
+  box-shadow:-6px 0 18px rgba(0,0,0,.08);padding:8px 10px;font-size:10.5px;white-space:pre-wrap;line-height:1.45;overflow:hidden}
+.mw-panel .pt{display:flex;justify-content:space-between;font-weight:700;font-size:11px;margin-bottom:6px;white-space:normal}
+/* ChatGPT */
+.mw-gpt .mw-side{background:#f9f9f9;border-right:1px solid #ececec}
+.mw-gpt .mw-msg.user{background:#f2f2f2}
+.mw-gpt .snd{background:#0d0d0d}
+.mw-gpt .mw-hello{font-size:18px}
+/* Claude */
+.mw-claude{background:#faf9f5}
+.mw-claude .mw-side{background:#f5f4ee;border-right:1px solid #e8e5da}
+.mw-claude .mw-logo{font-family:Georgia,'Times New Roman',serif;font-size:16px}
+.mw-claude .mw-hello{font-family:Georgia,'Batang',serif;font-size:20px}
+.mw-claude .mw-hello::first-letter{color:#d97757}
+.mw-claude .mw-msg.user{background:#f0eee6}
+.mw-claude .mw-in{border-radius:14px;flex-direction:column;align-items:stretch;gap:6px}
+.mw-claude .mw-in .r1{min-height:20px}
+.mw-claude .mw-in .r2{display:flex;justify-content:space-between;align-items:center}
+.mw-claude .snd{background:#c96442;border-radius:8px}
+/* Gemini */
+.mw-gemini .mw-side{background:#f8fafd}
+.mw-gemini .mw-main{background:radial-gradient(ellipse at 50% 55%,#dbe8fb 0%,#fff 62%)}
+.mw-gemini .mw-hello{font-size:19px}
+.mw-gemini .mw-msg.user{background:#e9eef6;border-radius:18px 4px 18px 18px}
+.mw-gemini .snd{background:#0b57d0}
+.mw-gemini .mw-modes span.on{background:#fff}
+/* 모델 고르기 카드 */
+.pick{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:12px 0 6px}
+.pick a{display:block;text-decoration:none;color:var(--ink);padding:18px 18px 16px;border-radius:22px;background:#fff;border:2px solid #eee;
+  box-shadow:0 14px 28px -20px rgba(60,50,120,.6);transition:transform .2s}
+.pick a:hover{transform:translateY(-4px)}
+.pick a b{display:block;font-size:20px;margin:4px 0}
+.pick a small{color:#666;font-size:13px;line-height:1.5;display:block}
+.pick a .go{display:inline-block;margin-top:10px;font-weight:800;font-size:13.5px}
+@media(max-width:640px){.pick{grid-template-columns:1fr}}
+.mtable td:first-child{white-space:nowrap;font-weight:700}
+"""
+
+
+def model_window(key, messages=(), *, marks=None, hist=(), hist_on=None, input_text=None, tools=False,
+                 paste=None, panel=None, side_on=None, number_menu=False):
+    """모델별 실제 화면 배치를 따른 모형. marks 키:
+    'new' / 'item:<이름>' / 'sec:<제목>' / 'hist' / 'input' / 'plus' / 'send' / 'copy' / 'mode' / 'panelcopy' / 메시지순번(int)"""
+    S = MODELS[key]
+    marks = marks or {}
+    M = lambda html, k, block=False: mk(html, marks[k], block) if k in marks else html  # noqa: E731
+    logo = f'<div class="mw-logo"><span>{E(S["logo"])}</span><small>{E(S["logo_tools"])}</small></div>'
+    side = [logo, M(f'<span class="mw-it{" on" if side_on in (None, S["new"]) and not hist_on else ""}">{S["new_icon"]} {E(S["new"])}</span>', "new")]
+    for ic, lb in S["items"]:
+        side.append(M(f'<span class="mw-it">{ic} {E(lb)}</span>', f"item:{lb}"))
+    for title, entries in S["sections"]:
+        side.append(M(f'<div class="mw-sec">{E(title)}</div>', f"sec:{title}", True))
+        side += [f'<span class="mw-it">{E(e)}</span>' for e in entries]
+    side.append(M(f'<div class="mw-sec">{E(S["hist_title"])}</div>', f'sec:{S["hist_title"]}', True))
+    for h in hist:
+        t = f'<span class="mw-it{" on" if h == hist_on else ""}">{E(h)}</span>'
+        side.append(M(t, "hist") if h == hist_on else t)
+    side.append(f'<div class="mw-prof">{E(S["profile"])}</div>')
+
+    snd = M(f'<span class="snd">↑</span>', "send")
+    if key == "gemini" and input_text is None:   # Gemini는 입력 전엔 🎙만 보이고 ↑는 글을 넣으면 나타남
+        snd = ""
+    ph_txt = input_text if input_text is not None else S["placeholder"]
+    ph = f'<span class="ph">{"" if not paste else ""}{E(ph_txt)}</span>'
+    if paste:
+        ph = f'<span class="ph"><span class="mw-paste">📄 {E(paste)}</span>\n{E(ph_txt)}</span>'
+    plus = M('<span class="plus">＋</span>', "plus")
+    right = f'<span>{S["right_icons"]}</span>' if S["right_icons"] else ""
+    if key == "claude":
+        inbox = f'<div class="mw-in"><div class="r1">{M(ph, "input")}</div><div class="r2">{plus}{snd}</div></div>'
+    else:
+        inbox = f'<div class="mw-in">{plus}{M(ph, "input")}{right}{snd}</div>'
+    if S["modes"]:
+        modes = '<div class="mw-modes">' + "".join(f'<span class="{"on" if i == 0 else ""}">{E(m)}</span>' for i, m in enumerate(S["modes"])) + "</div>"
+        inbox += M(modes, "mode", True)
+
+    main = [f'<div class="mw-top">{E(S["topright"])}</div>']
+    if not messages:
+        main.append(f'<div class="mw-hello">{E(S["hello"])}</div>{inbox}<div style="flex:1"></div>')
+    else:
+        msgs = []
+        for i, (who, text) in enumerate(messages):
+            m = f'<div class="mw-msg {who}">{E(text)}</div>'
+            msgs.append(mk(m, marks[i], block=True) if i in marks else m)
+        if tools:
+            t = "".join(M(f"<span>{E(x)}</span>", "copy") if x == S["copy_label"] else f"<span>{E(x)}</span>" for x in S["tools"])
+            msgs.append(f'<div class="mw-tools">{t}</div>')
+        main.append(f'<div class="mw-msgs">{"".join(msgs)}</div>{inbox}')
+    if panel:
+        title, body = panel
+        main.append(f'<div class="mw-panel"><div class="pt"><span>{E(title)}</span>{M("<span>⧉ 복사</span>", "panelcopy")}</div>{E(body)}</div>')
+    return (f'<div class="win-top"><span class="win-icon" style="background:{S["accent"]}"></span><span class="win-title">{E(S["url"])}</span></div>'
+            f'<div class="mw mw-{key}"><div class="mw-side">{"".join(side)}</div><div class="mw-main">{"".join(main)}</div></div>')
+
+
 def yt_block(url, title, icon):
     if url:
         vid = url.rstrip("/").split("/")[-1].split("v=")[-1].split("?")[0].split("&")[0]
@@ -224,11 +393,233 @@ def video_block():
     return '<div class="vpair">' + yt_block(VIDEO_URL, VIDEO_TITLE, "🎬") + yt_block(GUIDE_VIDEO_URL, GUIDE_TITLE, "🧭") + '</div>'
 
 
+# ───────────────────────── 모델별 안내 페이지 ─────────────────────────
+MODEL_TIPS = {
+    "gpt": dict(
+        login="오른쪽 위 <b>로그인</b> → 구글·이메일 계정으로 들어갑니다(무료 계정 가능)",
+        sidebar="왼쪽 메뉴가 안 보이면 왼쪽 위 ◫(사이드바 열기)를 누릅니다",
+        paste_note="긴 프롬프트도 입력창에 그대로 들어갑니다. 입력창이 길어지면 스크롤해서 끝까지 들어갔는지만 확인하세요.",
+        copy_note="답변 맨 아래 아이콘 줄의 첫 번째 ⧉(복사)를 누릅니다. 아이콘이 안 보이면 답변 위에 마우스를 올리세요.",
+        result_note=None,
+        stuck=[
+            ["오른쪽 위 ◌(임시 채팅)이 켜져 있다", "임시 채팅은 대화가 '최근' 목록에 남지 않습니다. 4-3에서 돌아갈 수 없으니 꺼 두세요."],
+            ["메모장에 ** 나 # 기호가 섞여 붙는다", "복사 버튼은 꾸밈 기호까지 복사합니다. \"메모장용 일반 글자로 다시 써 줘\"라고 보낸 뒤 다시 복사하세요."],
+            ["\"한도에 도달했습니다\" 안내가 뜬다", "무료 사용량 제한입니다. 잠시 뒤 다시 하거나 Claude·Gemini 탭으로 옮겨 이어서 하세요(설명서 txt만 있으면 됩니다)."],
+            ["답이 영어로 나온다", "\"한국어로 다시 써 줘\"라고 보내거나 새 채팅에서 다시 시작하세요."],
+        ]),
+    "claude": dict(
+        login="<b>Google로 계속하기</b> 또는 이메일로 로그인합니다(무료 계정 가능). 처음 들어오면 뜨는 쿠키 안내는 원하는 쪽을 고르면 됩니다",
+        sidebar="왼쪽 위 <b>Claude</b> 글자 옆 💬(채팅)·‹/›(코드) 중 <b>💬 채팅</b>이 선택되어 있어야 합니다. 메뉴가 안 보이면 맨 왼쪽 위 ▭(사이드바)를 누르세요",
+        paste_note="Claude는 긴 글을 붙여넣으면 입력창 위에 <b>📄 붙여넣은 텍스트</b> 카드로 바꿔 붙입니다. 내용은 그대로 들어간 것이니 그냥 보내면 됩니다.",
+        copy_note="답변 바로 아래 아이콘 줄의 ⧉(복사)를 누릅니다. 설명서가 화면 오른쪽 <b>문서 창</b>(아티팩트)에 따로 열렸다면, 그 창 오른쪽 위의 <b>복사</b>를 누르세요.",
+        result_note="긴 설명서는 오른쪽에 문서 창으로 열릴 수 있습니다. 왼쪽 대화에는 요약 카드만 보여도 정상입니다.",
+        stuck=[
+            ["왼쪽에 '새 채팅' 버튼이 없다", "Claude는 <b>＋ 새로 만들기</b>가 '새 채팅'입니다. 교안의 '새 채팅'은 모두 이 버튼으로 읽으세요."],
+            ["화면이 코드 편집 화면처럼 보인다", "왼쪽 위 Claude 글자 옆 ‹/›(코드)가 눌린 상태입니다. 💬(채팅)을 누르세요."],
+            ["\"메시지 한도에 도달\" 안내가 뜬다", "무료 사용량 제한입니다. 안내된 시간 뒤에 다시 하거나 ChatGPT·Gemini 탭으로 옮겨 이어서 하세요."],
+            ["붙여넣었는데 입력창에 글이 안 보인다", "입력창 위 📄 카드로 들어가 있습니다. 카드를 누르면 내용을 확인할 수 있습니다."],
+        ]),
+    "gemini": dict(
+        login="구글 계정으로 로그인합니다(학교·회사 계정은 Gemini가 막혀 있을 수 있으니 <b>개인 구글 계정</b> 권장)",
+        sidebar="입력창 아래 <b>채팅 / 작업</b> 중 <b>채팅</b>이 선택되어 있는지 확인합니다. 왼쪽 메뉴가 안 보이면 왼쪽 위 ◫를 누르세요",
+        paste_note="긴 프롬프트도 입력창에 그대로 들어갑니다. 붙여넣으면 오른쪽 🎙 자리에 ↑(보내기)가 나타납니다.",
+        copy_note="답변 아래 아이콘 줄(👍 👎 ↻ ⤴ ⧉ ⋮)에서 <b>⧉ 복사</b>를 누릅니다. 안 보이면 ⋮(더보기) 안에서 <b>복사</b>를 찾으세요.",
+        result_note="긴 글은 오른쪽 <b>Canvas</b> 창에 열릴 수 있습니다. 그때는 Canvas 창 오른쪽 위의 ⧉(복사)를 누르세요.",
+        stuck=[
+            ["입력창 아래 '작업'이 선택되어 있다", "'작업'은 AI가 여러 단계를 스스로 진행하는 방식입니다. 오늘은 <b>채팅</b>을 누르고 시작하세요."],
+            ["왼쪽에 지난 대화가 안 보인다", "왼쪽 위 🔍(검색)을 누르고 '마케팅' 등 대화 이름을 검색하세요."],
+            ["\"Gemini를 사용할 수 없습니다\" 안내", "학교·회사 구글 계정의 제한입니다. 개인 구글 계정으로 다시 로그인하세요."],
+            ["메모장에 ** 나 # 기호가 섞여 붙는다", "\"메모장용 일반 글자로 다시 써 줘\"라고 보낸 뒤 다시 복사하세요."],
+        ]),
+}
+
+
+def model_page(key):
+    S, T = MODELS[key], MODEL_TIPS[key]
+    nm, new = S["name"], S["new"]
+    NEW = ui(("＋ " if key == "claude" else "") + new)
+    hist_all = ("스킬 실행 – 거치대", "스킬 실행 – 감귤잼", "마케팅 스킬 만들기")
+
+    # ① 화면 둘러보기: 실제 화면 순서대로 번호
+    rows, marks, n = [], {}, 0
+    def add(mkey, name, where):
+        nonlocal n
+        n += 1
+        marks[mkey] = n
+        desc = S["item_desc"].get(name.replace(" ⌄", ""), "")
+        used = name.replace(" ⌄", "") in S["today"] or mkey == "input"
+        rows.append([str(n), name.replace(" ⌄", ""), where, desc or "프롬프트를 붙여넣는 곳", "✅ 사용" if used else "—"])
+    add("new", new, "왼쪽 맨 위")
+    for _, lb in S["items"]:
+        add(f"item:{lb}", lb, "왼쪽 메뉴")
+    for t, _ in S["sections"]:
+        add(f"sec:{t}", t, "왼쪽 묶음")
+    add(f'sec:{S["hist_title"]}', S["hist_title"], "왼쪽 아래 목록")
+    add("input", "입력창 — " + S["placeholder"], "가운데")
+    if S["modes"]:
+        add("mode", "채팅 / 작업", "입력창 아래")
+    marks_tour = dict(marks)
+    tour_rows = [[r[0], r[1], r[2], r[3], r[4]] for r in rows]
+
+    tour = (section(f"① {nm} 화면 둘러보기", f"실제 {nm} 첫 화면의 메뉴 순서 그대로 번호를 붙였습니다 (2026년 11월 화면 기준)")
+            + figs(fig(f"{key}-00", f"{nm} 첫 화면 — 메뉴 순서", model_window(key, marks=marks_tour, hist=hist_all[2:])))
+            + table(["번호", "메뉴(화면 표기)", "위치", "하는 일", "오늘"], tour_rows)
+            + box("info", "오늘 쓰는 것은 딱 셋", f"<b>{E(new)}</b>(새 대화) · <b>입력창</b>(붙여넣기) · <b>{E(S['hist_title'].replace(' ⌄', ''))}</b>(지난 대화로 돌아가기). "
+                  "나머지 메뉴는 눌러 보지 않아도 됩니다. 메뉴 이름·순서는 업데이트로 조금 바뀔 수 있습니다."))
+
+    hist_name = S["hist_title"].replace(" ⌄", "")
+    steps = [
+        step("0", f"{nm} 열고 로그인하기", f"{nm} 첫 화면을 띄웁니다.",
+             [f"크롬(Chrome) 주소창에 <b>{E(S['url'])}</b>를 입력하고 {kbd('Enter')}",
+              T["login"], T["sidebar"],
+              f"가운데에 <b>{E(S['hello'])}</b>와 입력창(<b>{E(S['placeholder'])}</b>)이 보이는지 확인합니다",
+              f"메모장도 열어 둡니다({kbd('⊞ Windows')} → <b>메모장</b> 입력 → 열기)"],
+             ok=f"위 '화면 둘러보기' 그림과 같은 화면이 보이면 성공입니다.",
+             stuck="로그인 화면에서 막히면 이미 쓰는 다른 AI 탭으로 바꿔 진행해도 됩니다. 결과는 같습니다.", one=True),
+        step("1", "맛보기 — 한 줄 부탁 vs 설명서 부탁 (선택)", "정보 없이 부탁하면 AI가 무엇을 지어내는지 비교해 봅니다. 시간이 없으면 건너뛰세요.",
+             [f"왼쪽 위 {NEW}을 누릅니다",
+              f"아래 첫 번째 상자를 {ui('복사')} → 입력창에 {kbd('Ctrl', 'V')} → {kbd('Enter')}",
+              f"결과를 본 뒤, 같은 대화에서 두 번째 상자를 {ui('복사')} → 붙여넣기 → 보내기"],
+             extra=prompt(P_TASTE_1) + prompt(P_TASTE_2),
+             ok="첫 번째 결과에는 알려 주지 않은 가격·'1위' 같은 말이 섞일 수 있고, 두 번째는 형식대로 나오며 가격은 [확인 필요]로 표시됩니다.",
+             figure=fig(f"{key}-01", f"{new} → 붙여넣기 → 보내기", model_window(
+                 key, marks={"new": 1, "input": 2, "send": 3}, input_text=P_TASTE_1, hist=hist_all[2:]))),
+        step("2-1", "만들 콘텐츠 3개 고르기", "내 스킬이 만들 콘텐츠를 정합니다.",
+             ["아래에서 <b>3개</b>를 고릅니다: 인스타그램 게시글 · 네이버 블로그 글 · 카카오톡 채널 홍보 메시지 · 상세페이지 소개 문구 · 숏폼 영상 대본(30초) · 홍보 이메일 · 문자(SMS) 문구",
+              "(선택) 내 스킬만의 특징 1개: 대상별 말투 / 제목 후보 2개 / 이미지 아이디어 / 확인 필요 목록"],
+             ok="고른 3개를 메모해 두었으면 다음으로 갑니다. 고르기 어렵다면 프롬프트에 이미 적힌 3개를 그대로 쓰세요.", one=True),
+        step("2-2", "스킬 만드는 프롬프트 보내기", "과제 조건에 맞는 스킬 설명서 초안을 받습니다.",
+             [f"왼쪽 위 {NEW}을 누릅니다",
+              f"아래 상자의 {ui('복사')} → 입력창 클릭 → {kbd('Ctrl', 'V')}",
+              "<b>[내가 만들고 싶은 콘텐츠]</b>·<b>[내 스킬만의 특징]</b> 아래 줄만 내 것으로 바꿉니다(입력창 안에서 고치기 어려우면 그대로 보내도 됩니다)",
+              f"오른쪽 {ui('↑')}(보내기)를 누릅니다"],
+             extra=prompt(P_MAKE) + box("info", f"{nm}에서는", T["paste_note"]),
+             ok="'0. 스킬 이름과 한 줄 설명' ~ '5. 최종 출력 순서'까지 번호 붙은 설명서가 나오면 성공입니다.",
+             stuck=f"답이 끊기면 \"계속\", 표·** 기호가 섞이면 \"메모장용 일반 글자로 다시 써 줘\". 줄 바꿈은 {kbd('Shift', 'Enter')}입니다.",
+             figure=figs(
+                 fig(f"{key}-02", "새 대화 → 프롬프트 붙여넣기 → 보내기", model_window(
+                     key, marks={"new": 1, "input": 2, "send": 4},
+                     input_text="" if key == "claude" else "너는 마케팅 업무를 돕는 'AI 스킬'을 설계하는 전문가야. …",
+                     paste="붙여넣은 텍스트 · 31줄" if key == "claude" else None, hist=("감귤잼 홍보 글",))),
+                 fig(f"{key}-03", "AI가 만든 스킬 설명서(예시)", model_window(
+                     key, [("user", "너는 마케팅 업무를 돕는 'AI 스킬'을 설계하는 전문가야. …"),
+                           ("ai", "스킬 설명서를 만들었습니다." if key == "claude" else skill_preview())],
+                     hist=("마케팅 스킬 만들기", "감귤잼 홍보 글"), hist_on="마케팅 스킬 만들기",
+                     panel=("📄 스킬 설명서", skill_preview()) if key == "claude" else None)))),
+        step("2-3", "복사해서 메모장에 txt로 저장", "제출할 스킬 파일을 만듭니다.",
+             [T["copy_note"],
+              f"메모장 클릭 → {kbd('Ctrl', 'V')}",
+              f"{ui('파일')} → {ui('다른 이름으로 저장')}",
+              f"파일 이름 <b>트랙B_스킬_내이름.txt</b>, 인코딩 {ui('UTF-8')} 확인 → {ui('저장')}"],
+             ok="메모장 제목이 '트랙B_스킬_내이름.txt - 메모장'으로 바뀌면 성공입니다.",
+             stuck=f"복사 아이콘을 못 찾으면 답변 글을 마우스로 끌어 선택 → {kbd('Ctrl', 'C')}.",
+             figure=figs(
+                 fig(f"{key}-04", f"{nm} 답변 아래 복사 버튼" + (" (문서 창이면 창 위 복사)" if key == "claude" else ""), model_window(
+                     key, [("user", "너는 마케팅 업무를 돕는 'AI 스킬'을 설계하는 전문가야. …"),
+                           ("ai", "스킬 설명서를 만들었습니다." if key == "claude" else skill_preview())],
+                     tools=True, marks={"copy": 1, "panelcopy": 1} if key == "claude" else {"copy": 1},
+                     panel=("📄 스킬 설명서", skill_preview()) if key == "claude" else None,
+                     hist=("마케팅 스킬 만들기",), hist_on="마케팅 스킬 만들기")),
+                 fig(f"{key}-05", "메모장 → 다른 이름으로 저장 → UTF-8", notepad(
+                     skill_preview(), text_mark=2, overlay=save_dialog("트랙B_스킬_내이름.txt", n_name=4, n_enc=None))))),
+        step("3-1", "새 대화에 스킬 설명서 넣기", "처음 보는 AI도 내 설명서만으로 일하는지 시험합니다.",
+             [f"{NEW}을 누릅니다",
+              f"아래 시작 문장을 {ui('복사')} → 입력창에 {kbd('Ctrl', 'V')}",
+              f"메모장에서 {kbd('Ctrl', 'A')} → {kbd('Ctrl', 'C')} → 입력창(시작 문장 아래)에 {kbd('Ctrl', 'V')}",
+              f"{ui('↑')}(보내기)"],
+             extra=prompt(P_RUN),
+             ok="AI가 \"상품 정보를 보내 주세요\"라고 답하면 성공입니다.",
+             stuck=f"{ui('＋')}(파일 추가)로 txt 파일을 올리고 시작 문장만 보내도 됩니다." + (" 붙여넣은 설명서가 📄 카드로 바뀌는 것은 정상입니다." if key == "claude" else ""),
+             figure=fig(f"{key}-06", "새 대화 → 시작 문장 + 설명서 → 보내기", model_window(
+                 key, marks={"new": 1, "input": 3, "send": 4},
+                 input_text="지금부터 붙여넣는 글은 '스킬 설명서'야. …" + ("" if key == "claude" else "\n\n0. 스킬 이름과 한 줄 설명 …"),
+                 paste="붙여넣은 텍스트 · 스킬 설명서" if key == "claude" else None, hist=("마케팅 스킬 만들기",)))),
+        step("3-2", "샘플 상품(감귤잼) 보내기", "스킬을 실제로 돌려 샘플 출력물을 만듭니다.",
+             [f"같은 대화에서 아래 상자를 {ui('복사')} → 붙여넣기 → 보내기"],
+             extra=prompt(SAMPLE1),
+             ok="정한 콘텐츠가 순서대로 나오고 가격 자리에 [확인 필요]가 보이면 성공입니다." + (f" {T['result_note']}" if T["result_note"] else ""),
+             stuck=f"AI가 가격을 먼저 물으면 정상입니다. 아래를 보내세요.{prompt(P_NO_PRICE)}",
+             figure=fig(f"{key}-07", "콘텐츠가 한 번에 나옴(예시)", model_window(
+                 key, [("user", "[상품 정보] ※ 실습용 가상 상품입니다\n- 상품명: 귤빛담은 수제 감귤잼 …"),
+                       ("ai", "[1] 인스타그램 게시글\n아이 간식, 성분표부터 보게 되시죠? …\n\n[2] 네이버 블로그 글\n제목: …\n\n[3] 카카오톡 채널 메시지 …\n\n※ 가격: [확인 필요]")],
+                 tools=True, marks={"copy": 1}, hist=("스킬 실행 – 감귤잼", "마케팅 스킬 만들기"), hist_on="스킬 실행 – 감귤잼"))),
+        step("3-3", "출력물 저장", "심사 보조자료(샘플 출력물)를 파일로 남깁니다.",
+             [f"답변 아래 {ui('⧉ 복사')}",
+              f"메모장 {kbd('Ctrl', 'N')}(새 탭) → {kbd('Ctrl', 'V')}",
+              f"{ui('파일')} → {ui('다른 이름으로 저장')} → <b>트랙B_출력물_감귤잼_내이름.txt</b>"],
+             ok="메모장 위에 탭 두 개(스킬, 출력물)가 보이면 성공입니다.", one=True),
+        step("4-1", "결과물 점검시키기", "지어낸 내용·형식 위반을 AI가 스스로 찾게 합니다.",
+             [f"3-2를 한 <b>같은 대화</b>에서 아래 상자를 {ui('복사')} → 붙여넣기 → 보내기"],
+             extra=prompt(P_CHECK),
+             ok="1번·3번이 모두 \"없음\"이면 통과. 문제가 있었다면 4번의 고친 결과로 출력물 파일을 바꿔 저장하세요.", one=True),
+        step("4-2", "다른 상품(노트북 거치대)으로 재사용 시험", "필수 ③ — 다른 상품에도 되는지 확인합니다.",
+             [f"{NEW} → 3-1처럼 시작 문장 + 설명서 보내기",
+              f"아래 상자를 {ui('복사')} → 붙여넣기 → 보내기"],
+             extra=prompt(SAMPLE2),
+             ok="감귤잼 때와 같은 구성·순서로 거치대에 맞는 내용이 나오면 성공입니다.",
+             stuck="'감귤', '아이 간식' 이야기가 섞이면 설명서에 특정 상품이 남아 있다는 뜻입니다. 4-3에서 고치세요.", one=True),
+        step("4-3", "스킬 설명서 고치기", f"왼쪽 '{hist_name}' 목록에서 스킬을 만든 대화로 돌아가 고칩니다.",
+             [f"왼쪽 <b>{E(hist_name)}</b> 목록에서 {ui('마케팅 스킬 만들기')}(스킬을 만든 대화)를 누릅니다",
+              f"아래 상자를 {ui('복사')} → 붙여넣기 → <b>[문제]</b> 아래 줄을 내가 겪은 문제로 바꾸기",
+              "보내기",
+              f"새 설명서를 {ui('⧉ 복사')} → 메모장 스킬 탭 {kbd('Ctrl', 'A')} → {kbd('Ctrl', 'V')} → {kbd('Ctrl', 'S')}"],
+             extra=prompt(P_FIX),
+             ok="고친 설명서로 3-1~3-2를 새 대화에서 다시 돌려 문제가 사라지면 성공입니다.",
+             stuck=f"대화 이름은 {nm}가 자동으로 붙여서 다를 수 있습니다. 목록에서 찾기 어려우면 🔍 검색에 '스킬'을 입력하세요.",
+             figure=fig(f"{key}-08", f"'{hist_name}' 목록 → 스킬 만든 대화 → 고치기 요청", model_window(
+                 key, [("ai", "스킬 설명서를 만들었습니다." if key == "claude" else skill_preview())],
+                 hist=hist_all, hist_on="마케팅 스킬 만들기", input_text="스킬 설명서를 시험해 봤더니 아래 문제가 있었어. …",
+                 marks={"hist": 1, "input": 2, "send": 3}))),
+        step("5", "최종 점검과 제출 파일 정리", "과제 조건 5개를 모두 채웠는지 확인합니다.",
+             [f"{NEW} → 아래 상자를 {ui('복사')} → 붙여넣기",
+              f"이어서 메모장 스킬 설명서 전체({kbd('Ctrl', 'A')} → {kbd('Ctrl', 'C')})를 입력창 끝에 {kbd('Ctrl', 'V')} → 보내기",
+              "'부족'이 나온 조건은 알려 준 문장을 설명서에 넣고 저장",
+              f"<a href='#p5' data-go='p5'>5 제출 탭</a>의 점검표로 파일 2개(스킬 txt · 출력물 txt)를 확인"],
+             extra=prompt(P_FINAL),
+             ok="다섯 조건이 모두 '충족'이고 파일 2개가 준비되면 끝입니다. 수고하셨습니다! 🎉", one=True),
+    ]
+    html = "".join(steps)
+    for st in ["0", "1", "2-1", "2-2", "2-3", "3-1", "3-2", "3-3", "4-1", "4-2", "4-3", "5"]:
+        html = html.replace(f'id="s{st}"', f'id="{key}-s{st}"', 1)
+    trouble = (section(f"③ {nm}에서 자주 막히는 점")
+               + table(["이런 일이 생기면", "이렇게 하세요"], T["stuck"], raw=True)
+               + box("info", "다른 AI로 옮겨도 됩니다", "스킬 설명서 txt 파일만 있으면 ChatGPT·Claude·Gemini 어디서든 3-1부터 이어서 할 수 있습니다."))
+    other = " · ".join(f"<a href='#{k}' data-go='{k}'>{MODELS[k]['icon']} {MODELS[k]['name']}</a>" for k in MODELS if k != key)
+    return wrap(
+        tab_hero(S["icon"], f"{nm} 사용자용 · 처음부터 끝까지 한 페이지", f"{nm}로 따라 하기",
+                 f"{nm} 실제 화면의 메뉴 이름과 순서대로 안내합니다")
+        + box("info", "이 페이지만 보면 됩니다", f"준비부터 제출까지 {nm} 화면 기준으로 한 페이지에 모았습니다. "
+              f"단계별 자세한 설명은 0~5 탭에 있습니다. 다른 AI를 쓴다면 👉 {other}")
+        + tour + section(f"② {nm}로 따라 하기", "번호 순서대로 — 글의 번호와 그림의 빨간 번호가 같은 곳을 가리킵니다") + html + trouble,
+        pc_note=PC)
+
+
+def model_pager(key):
+    ks = list(MODELS)
+    other = "".join(f'<a class="prev" href="#{k}" data-go="{k}"><small>다른 AI로 보기</small><b>{MODELS[k]["icon"]} {E(MODELS[k]["name"])}</b></a>'
+                    for k in ks if k != key)
+    return (f'<nav class="pager" aria-label="단계 이동"><a class="prev" href="#home" data-go="home"><small>← 처음으로</small><b>홈 · AI 다시 고르기</b></a>'
+            f'<a class="next" href="#ap" data-go="ap"><small>막히면 →</small><b>부록</b></a></nav>'
+            f'<nav class="pager" aria-label="다른 AI">{other}</nav>')
+
+
+def pick_cards():
+    desc = {"gpt": "OpenAI의 AI. 왼쪽 메뉴: 새 채팅 · 이미지 · 예약 · 라이브러리 …",
+            "claude": "Anthropic의 AI. 왼쪽 메뉴: 새로 만들기 · 검색 · 프로젝트 · 아티팩트 …",
+            "gemini": "Google의 AI. 왼쪽 메뉴: 새 채팅 · 라이브러리 · 이미지 · 예약 …"}
+    return '<div class="pick">' + "".join(
+        f'<a href="#{k}" data-go="{k}" style="border-color:{S["accent"]}33"><span style="font-size:26px">{S["icon"]}</span>'
+        f'<b>{E(S["name"])}</b><small>{E(S["url"])}<br>{E(desc[k])}</small><span class="go" style="color:{S["accent"]}">{E(S["name"])} 화면으로 따라 하기 →</span></a>'
+        for k, S in MODELS.items()) + "</div>"
+
+
 # ───────────────────────── 홈 ─────────────────────────
 home = clay_hero("제5회 2026 스마트워크톤 · 트랙B", "스킬 제작 가이드<br><em>복사·붙여넣기로<br>완성하는 AI 스킬</em>",
             "AI를 잘 몰라도 괜찮습니다. 화면 순서대로 복사하고 붙여넣기만 하면, 상품 정보 하나로 마케팅 콘텐츠를 한 번에 만드는 나만의 AI 스킬이 완성됩니다.",
             ["📋 복사·붙여넣기", "🤖 ChatGPT·Claude·Gemini", "📄 txt 제출", "⏱ 약 90분"]) + wrap(
-    section("시작하기 전에, 이 영상 먼저", "AI가 낯설어도, 대회가 처음이어도 괜찮습니다 — 두 영상이면 마음이 한결 가벼워집니다")
+    section("내가 쓰는 AI를 고르세요", "고른 AI의 실제 화면(메뉴 이름·순서) 그대로 처음부터 끝까지 따라 하는 페이지로 이동합니다")
+    + pick_cards()
+    + section("시작하기 전에, 이 영상 먼저", "AI가 낯설어도, 대회가 처음이어도 괜찮습니다 — 두 영상이면 마음이 한결 가벼워집니다")
     + video_block()
     + section("오늘의 과제", "개인전 과제를 그대로 따라갑니다")
     + table(["항목", "내용"], [
@@ -264,7 +655,7 @@ home = clay_hero("제5회 2026 스마트워크톤 · 트랙B", "스킬 제작 �
                  ("practice/product_form.txt", "✍ 내 상품 정보 입력 틀", ""),
                  ("practice/skill_template.txt", "🧩 스킬 설명서 빈칸 틀", ""),
                  ("practice/checklist.txt", "✅ 제출 전 점검표", "")])
-    + box("info", "그림 안내", "교안의 화면 그림은 이해를 돕는 <b>모형</b>입니다. ChatGPT·Claude·Gemini 어느 것을 써도 '새 채팅 → 붙여넣기 → 보내기' 순서는 같습니다. 글의 번호와 그림의 빨간 번호가 같은 곳을 가리킵니다."))
+    + box("info", "그림 안내", "교안의 화면 그림은 이해를 돕는 <b>모형</b>입니다. ChatGPT·Claude·Gemini 어느 것을 써도 '새 채팅 → 붙여넣기 → 보내기' 순서는 같습니다(Claude는 '새 채팅' 대신 '＋ 새로 만들기'). 내 AI의 실제 화면 배치로 보고 싶다면 위 <b>AI 고르기</b>에서 고르세요. 글의 번호와 그림의 빨간 번호가 같은 곳을 가리킵니다."))
 
 # ───────────────────────── 0 준비 ─────────────────────────
 p0 = wrap("".join([
@@ -273,9 +664,11 @@ p0 = wrap("".join([
          ["크롬(Chrome)을 열고 아래 표의 주소 중 하나로 들어가 로그인합니다",
           f"왼쪽 위 {ui('＋ 새 채팅')}을 누릅니다",
           "화면 아래 입력창이 보이는지 확인합니다"],
-         extra=table(["AI", "주소", "새 대화 버튼"], [["ChatGPT", "chatgpt.com", "새 채팅"], ["Claude", "claude.ai", "새 채팅"],
+         extra=table(["AI", "주소", "새 대화 버튼"], [["ChatGPT", "chatgpt.com", "새 채팅"], ["Claude", "claude.ai", "＋ 새로 만들기"],
                                                    ["Gemini", "gemini.google.com", "새 채팅"]])
-         + box("info", "어떤 AI든 괜찮아요", "무료 계정으로도 오늘 실습을 모두 할 수 있습니다. 이미 쓰고 있는 AI가 있다면 그것을 쓰세요."),
+         + box("info", "어떤 AI든 괜찮아요", "무료 계정으로도 오늘 실습을 모두 할 수 있습니다. 이미 쓰고 있는 AI가 있다면 그것을 쓰세요. "
+               "이 교안의 '새 채팅'은 Claude에서는 <b>＋ 새로 만들기</b>입니다. 내 AI 화면 그대로 보려면 위쪽 "
+               "<a href='#gpt' data-go='gpt'>🟢 ChatGPT</a> · <a href='#claude' data-go='claude'>🟠 Claude</a> · <a href='#gemini' data-go='gemini'>🔵 Gemini</a> 탭을 보세요."),
          ok="가운데에 인사말, 아래에 '메시지를 입력하세요' 입력창이 보이면 성공입니다.",
          stuck=f"로그인 화면이 나오면 {ui('Google로 계속하기')}를 눌러 구글 계정으로 들어가면 가장 빠릅니다.",
          figure=fig("m0-01", "＋ 새 채팅 → 입력창", ai_window(new_mark=2, hist=(), marks={"input": 3}))),
@@ -499,14 +892,18 @@ blocks = [("1-1 한 줄 부탁(맛보기)", P_TASTE_1), ("1-2 정보와 형식�
     "스마트워크톤 트랙B · 제출 전 점검표\n\n" + "\n".join(f"[ ] {a} — {b}" for a, b in CHECKLIST)
     + "\n\n제출 파일\n[ ] ① 트랙B_스킬_내이름.txt\n[ ] ② 트랙B_출력물_감귤잼_내이름.txt\n", encoding="utf-8")
 
-PAGES = [
+STEP_PAGES = [
     Page("home", "", "홈", home), Page("p0", "0", "준비", p0), Page("p1", "1", "맛보기", p1), Page("p2", "2", "스킬 만들기", p2),
     Page("p3", "3", "실행", p3), Page("p4", "4", "점검·고치기", p4), Page("p5", "5", "제출", p5), Page("ap", "+", "부록", ap)]
-add_pager(PAGES)
+add_pager(STEP_PAGES)
+STEP_PAGES[0].html = home + ('<nav class="pager" aria-label="시작"><a class="prev" href="#p0" data-go="p0"><small>공통 단계로 →</small><b>0 준비부터 차례로</b></a>'
+                             '<a class="next" href="#gpt" data-go="gpt"><small>내 AI 화면으로 →</small><b>🟢 ChatGPT · 🟠 Claude · 🔵 Gemini</b></a></nav>')
+MODEL_PAGES = [Page(k, S["icon"], S["name"], model_page(k) + model_pager(k)) for k, S in MODELS.items()]
+PAGES = STEP_PAGES[:1] + MODEL_PAGES + STEP_PAGES[1:]
 
 build(DOCS / "index.html", PAGES,
     title="스킬 제작 가이드 | 스마트워크톤 트랙B",
     description="복사·붙여넣기만으로 상품 정보 하나로 마케팅 콘텐츠를 한 번에 만드는 AI 스킬(txt)을 완성하는 단계별 가이드",
     brand=("B", "스킬 제작 가이드", "제5회 스마트워크톤 · 트랙B"),
-    site_url=SITE_URL, og_image="og_image.jpg", og_title="스킬 제작 가이드 — 스마트워크톤 트랙B", extra_css=EXTRA_CSS + THEME_CSS)
+    site_url=SITE_URL, og_image="og_image.jpg", og_title="스킬 제작 가이드 — 스마트워크톤 트랙B", extra_css=EXTRA_CSS + MODEL_CSS + THEME_CSS)
 print("wrote", DOCS / "index.html")
